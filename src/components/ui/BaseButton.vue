@@ -7,6 +7,7 @@ type Props = {
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
   fullWidth?: boolean;
+   iconOnly?: boolean;
 };
 
 const props = withDefaults(defineProps<Props>(), {
@@ -15,6 +16,7 @@ const props = withDefaults(defineProps<Props>(), {
   type: "button",
   disabled: false,
   fullWidth: false,
+  iconOnly: false,
 });
 
 defineEmits<{
@@ -25,6 +27,9 @@ const buttonClasses = computed(() => {
   const baseClasses =
     "inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
 
+if (props.iconOnly) {
+  return `inline-flex items-center justify-center p-2 text-gray-600 hover:text-blue-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-0 focus:ring-offset-0`;
+}
   const variantClasses = {
     primary: "bg-primary text-white hover:bg-blue-700 focus:ring-blue-500",
     secondary: "bg-secondary text-white hover:bg-gray-700 focus:ring-gray-500",
@@ -41,13 +46,19 @@ const buttonClasses = computed(() => {
   const widthClass = props.fullWidth ? "w-full" : "";
 
   return `${baseClasses} ${variantClasses[props.variant]} ${sizeClasses[props.size]} ${widthClass}`;
+
 });
 </script>
 
 
 
 <template>
-  <button :type="type" :disabled="disabled" :class="buttonClasses" @click="$emit('click', $event)">
+  <button
+    :type="type"
+    :disabled="disabled"
+    :class="buttonClasses"
+    @click="$emit('click', $event)"
+  >
     <slot />
   </button>
 </template>
