@@ -23,14 +23,14 @@ import BaseButton from './ui/BaseButton.vue';
             <router-link
               to="/legends"
               class=" px-3 py-2 rounded-md  font-normal transition-colors"
-              active-class="text-primary"
+              exact-active-class="text-primary"
             >
               Legends
             </router-link>
             <router-link
               to="/legends/create"
               class=" px-3 py-2 rounded-md  font-normal transition-colors"
-              active-class="text-primary"
+              exact-active-class="text-primary"
             >
               Create Legend
             </router-link>

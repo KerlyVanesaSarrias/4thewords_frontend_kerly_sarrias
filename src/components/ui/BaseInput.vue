@@ -1,18 +1,24 @@
 <script setup lang="ts">
-import { Eye, EyeOff } from 'lucide-vue-next'
-import { computed, ref } from 'vue'
-import BaseButton from './BaseButton.vue'
+import { Eye, EyeOff } from 'lucide-vue-next';
+import { computed, ref } from 'vue';
+import BaseButton from './BaseButton.vue';
+
+defineEmits<{
+  (e: 'update:modelValue', value: string | File): void
+}>()
 
 type Props = {
-  id?: string
+    id?: string
   label?: string
-  type?: 'text' | 'email' | 'password'
-  modelValue?: string
+  type?: 'text' | 'email' | 'password' | 'select' | 'date'  | 'textarea'  | 'file'
+  modelValue?: string  | File
   placeholder?: string
   required?: boolean
   disabled?: boolean
   error?: string
   showTogglePassword?: boolean
+  options?: { label: string; value: string }[] 
+  accept?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -22,9 +28,11 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   placeholder: '',
   error: '',
+  options: () => [],
+  accept: 'image/*',
 })
 
-defineEmits(['update:modelValue'])
+
 
 const showPassword = ref(false)
 
@@ -63,7 +71,33 @@ const togglePassword = () => {
     </label>
 
     <div class="relative">
+      <textarea
+        v-if="type === 'textarea'"
+        :id="id"
+        :value="typeof modelValue === 'string' ? modelValue : ''"
+        :placeholder="placeholder"
+        :required="required"
+        :disabled="disabled"
+        :class="inputClasses"
+        rows="5"
+        @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
+      />
+
       <input
+        v-else-if="type === 'file'"
+        type="file"
+        :id="id"
+        :required="required"
+        :disabled="disabled"
+        :accept="accept"
+        class="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4
+         file:rounded-md file:border-0 file:text-sm file:font-semibold
+         file:bg-purple-600 file:text-white hover:file:bg-purple-700
+         transition duration-200"
+      >
+
+      <input
+        v-else-if="type !== 'select'"
         :id="id"
         :type="inputType"
         :value="modelValue"
@@ -73,6 +107,31 @@ const togglePassword = () => {
         :class="inputClasses"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       >
+
+      <select
+        v-else
+        :id="id"
+        :value="modelValue"
+        :required="required"
+        :disabled="disabled"
+        :class="inputClasses"
+        @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+      >
+        <option
+          disabled
+          value=""
+          v-if="placeholder"
+        >
+          {{ placeholder }}
+        </option>
+        <option
+          v-for="opt in options"
+          :key="opt.value"
+          :value="opt.value"
+        >
+          {{ opt.label }}
+        </option>
+      </select>
 
       <BaseButton
         v-if="showTogglePassword && type === 'password'"

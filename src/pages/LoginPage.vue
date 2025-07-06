@@ -1,9 +1,10 @@
 <script setup lang="ts">
-  import { useField, useForm } from "vee-validate";
+import { useField, useForm } from "vee-validate";
 import { ref } from "vue";
 import * as yup from "yup";
 import BaseButton from "../components/ui/BaseButton.vue";
 import BaseInput from "../components/ui/BaseInput.vue";
+import GradientBackground from "../components/ui/GradientBackground.vue";
 
 const loading = ref(false);
 const errorMessage = ref("");
@@ -36,64 +37,66 @@ const onSubmit = handleSubmit(async (values) => {
 </script>
 
 <template>
-  <div class="h-screen flex">
-    <div class="bg-[url('/imgLogin.png')] bg-cover bg-center hidden md:block md:w-5/12" />
-    <div
-      class="w-full md:w-7/12 flex items-center justify-center px-8 py-12 bg-secondary"
-    >
-      <div class="w-full max-w-md space-y-8">
-        <div class="text-center">
-          <h2 class="text-2xl font-semibold text-white">
-            Welcome
-          </h2>
+  <GradientBackground>
+    <div class="h-screen flex">
+      <div class="bg-[url('/imgLogin.png')] bg-cover bg-center hidden md:block md:w-5/12" />
+      <div
+        class="w-full md:w-7/12 flex items-center justify-center px-8 py-12"
+      >
+        <div class="w-full max-w-md space-y-8">
+          <div class="text-center">
+            <h2 class="text-2xl font-semibold text-white">
+              Welcome
+            </h2>
+          </div>
+          <form
+            @submit.prevent="onSubmit"
+            class="space-y-6"
+          >
+            <div class="flex flex-col">
+              <BaseInput
+                v-model="email"
+                name="email"
+                label="Email"
+                type="email"
+                required
+                :error="emailError"
+                placeholder="email@example.com"
+              />
+            </div>
+
+            <div class="flex flex-col relative">
+              <BaseInput
+                v-model="password"
+                name="password"
+                label="Password"
+                type="password"
+                :error="passwordError"
+                required
+                placeholder="Enter your password"
+                show-toggle-password
+              />
+            </div>
+            <BaseButton
+              type="submit"
+              :disabled="loading"
+            >
+              <span
+                v-if="loading"
+                class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
+              />
+              <span :class="{ 'opacity-0': loading }">Log In</span>
+            </BaseButton>
+
+            <div
+              v-if="errorMessage"
+              class="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg"
+            >
+              {{ errorMessage }}
+            </div>
+          </form>
         </div>
-        <form
-          @submit.prevent="onSubmit"
-          class="space-y-6"
-        >
-          <div class="flex flex-col">
-            <BaseInput
-              v-model="email"
-              name="email"
-              label="Email"
-              type="email"
-              required
-              :error="emailError"
-              placeholder="email@example.com"
-            />
-          </div>
-
-          <div class="flex flex-col relative">
-            <BaseInput
-              v-model="password"
-              name="password"
-              label="Password"
-              type="password"
-              :error="passwordError"
-              required
-              placeholder="Enter your password"
-              show-toggle-password
-            />
-          </div>
-          <BaseButton
-            type="submit"
-            :disabled="loading"
-          >
-            <span
-              v-if="loading"
-              class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"
-            />
-            <span :class="{ 'opacity-0': loading }">Log In</span>
-          </BaseButton>
-
-          <div
-            v-if="errorMessage"
-            class="text-red-600 text-sm text-center bg-red-50 p-3 rounded-lg"
-          >
-            {{ errorMessage }}
-          </div>
-        </form>
       </div>
     </div>
-  </div>
+  </GradientBackground>
 </template>

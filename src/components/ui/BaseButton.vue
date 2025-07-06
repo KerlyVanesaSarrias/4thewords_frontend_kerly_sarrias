@@ -31,7 +31,7 @@ if (props.iconOnly) {
   return `inline-flex items-center justify-center p-2 text-gray-600 hover:text-blue-600 rounded-md disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-0 focus:ring-offset-0`;
 }
   const variantClasses = {
-    primary: "bg-primary text-white hover:bg-blue-700 focus:ring-blue-500",
+    primary: "bg-purple-600 text-white hover:bg-purple-700",
     secondary: "bg-secondary text-white hover:bg-gray-700 focus:ring-gray-500",
     danger: "bg-red-600 text-white hover:bg-red-700 focus:ring-red-500",
     outline: "border-2 border-blue-600 text-blue-600 hover:bg-blue-50 focus:ring-blue-500",
