@@ -5,6 +5,7 @@ import * as yup from "yup";
 import BaseButton from "../components/ui/BaseButton.vue";
 import BaseInput from "../components/ui/BaseInput.vue";
 import GradientBackground from "../components/ui/GradientBackground.vue";
+import { useAuthStore } from "../stores/auth";
 
 const loading = ref(false);
 const errorMessage = ref("");
@@ -14,6 +15,7 @@ const schema = yup.object({
   password: yup.string().required("Password is required").min(6, "Minimum 6 characters"),
 });
 
+const auth = useAuthStore();
 const {handleSubmit} = useForm( { validationSchema: schema });
 const {value: email, errorMessage: emailError} = useField<string>("email");
 const {value: password, errorMessage: passwordError} = useField<string>("password");
@@ -23,10 +25,7 @@ const onSubmit = handleSubmit(async (values) => {
   errorMessage.value = "";
 
   try {
-    await new Promise(() => setTimeout(() => {
-      console.log("Simulating API call with values:", values);
-    }, 1000));
-    console.log("Login successful", values);
+    await auth.login(values.email, values.password);
   } catch {
     errorMessage.value = "Login failed. Please try again.";
   } finally {
@@ -74,10 +73,10 @@ const onSubmit = handleSubmit(async (values) => {
                 :error="passwordError"
                 required
                 placeholder="Enter your password"
-                show-toggle-password
               />
             </div>
             <BaseButton
+              @click="(e)=> {console.log('Button clicked', e);}"
               type="submit"
               :disabled="loading"
             >

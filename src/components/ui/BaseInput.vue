@@ -4,20 +4,18 @@ import { computed, ref } from 'vue';
 import BaseButton from './BaseButton.vue';
 
 defineEmits<{
-  (e: 'update:modelValue', value: string | File): void
+  (e: 'update:modelValue', value: string  | File ): void
 }>()
 
 type Props = {
-    id?: string
+  id?: string
   label?: string
-  type?: 'text' | 'email' | 'password' | 'select' | 'date'  | 'textarea'  | 'file'
-  modelValue?: string  | File
+  type?: 'text' | 'email' | 'password' | 'number'   | 'file'
+ modelValue?: string | File;
   placeholder?: string
   required?: boolean
   disabled?: boolean
   error?: string
-  showTogglePassword?: boolean
-  options?: { label: string; value: string }[] 
   accept?: string
 }
 
@@ -28,21 +26,17 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   placeholder: '',
   error: '',
-  options: () => [],
   accept: 'image/*',
 })
 
-
-
 const showPassword = ref(false)
 
-const inputType = computed(() =>
-  props.showTogglePassword && props.type === 'password'
-    ? showPassword.value
+const inputType = computed(() => {
+  if(props.type !== 'password') return props.type;
+  return showPassword.value
       ? 'text'
       : 'password'
-    : props.type
-)
+})
 
 const inputClasses = computed(() =>
   [
@@ -71,33 +65,8 @@ const togglePassword = () => {
     </label>
 
     <div class="relative">
-      <textarea
-        v-if="type === 'textarea'"
-        :id="id"
-        :value="typeof modelValue === 'string' ? modelValue : ''"
-        :placeholder="placeholder"
-        :required="required"
-        :disabled="disabled"
-        :class="inputClasses"
-        rows="5"
-        @input="$emit('update:modelValue', ($event.target as HTMLTextAreaElement).value)"
-      />
-
       <input
-        v-else-if="type === 'file'"
-        type="file"
-        :id="id"
-        :required="required"
-        :disabled="disabled"
-        :accept="accept"
-        class="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4
-         file:rounded-md file:border-0 file:text-sm file:font-semibold
-         file:bg-purple-600 file:text-white hover:file:bg-purple-700
-         transition duration-200"
-      >
-
-      <input
-        v-else-if="type !== 'select'"
+        v-if="type !== 'file' "   
         :id="id"
         :type="inputType"
         :value="modelValue"
@@ -107,34 +76,20 @@ const togglePassword = () => {
         :class="inputClasses"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       >
-
-      <select
-        v-else
+      <input
+        v-else-if="type === 'file'"
         :id="id"
-        :value="modelValue"
+        type="file"
+        :accept="accept"
         :required="required"
         :disabled="disabled"
-        :class="inputClasses"
-        @change="$emit('update:modelValue', ($event.target as HTMLSelectElement).value)"
+        class="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4
+         file:rounded-md file:border-0 file:text-sm file:font-semibold
+         file:bg-purple-600 file:text-white hover:file:bg-purple-700
+         transition duration-200"
       >
-        <option
-          disabled
-          value=""
-          v-if="placeholder"
-        >
-          {{ placeholder }}
-        </option>
-        <option
-          v-for="opt in options"
-          :key="opt.value"
-          :value="opt.value"
-        >
-          {{ opt.label }}
-        </option>
-      </select>
-
       <BaseButton
-        v-if="showTogglePassword && type === 'password'"
+        v-if="type === 'password'"
         type="button"
         icon-only
         class="absolute inset-y-0 right-2 flex items-center text-gray-500"

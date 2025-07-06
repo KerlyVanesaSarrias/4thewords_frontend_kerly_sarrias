@@ -20,8 +20,9 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 defineEmits<{
-  click: [event: MouseEvent];
+  (e: "click", event: MouseEvent): void;
 }>();
+
 
 const buttonClasses = computed(() => {
   const baseClasses =
