@@ -3,7 +3,10 @@ import { useField, useForm } from 'vee-validate';
 import { ref } from 'vue';
 import * as yup from 'yup';
 import BaseButton from '../../components/ui/BaseButton.vue';
+import BaseDateInput from '../../components/ui/BaseDateInput.vue';
 import BaseInput from '../../components/ui/BaseInput.vue';
+import BaseSelect from '../../components/ui/BaseSelect.vue';
+import BaseTextarea from '../../components/ui/BaseTextarea.vue';
 import GradientBackground from '../../components/ui/GradientBackground.vue';
 
 
@@ -17,9 +20,9 @@ const schema = yup.object({
   province: yup.string().required('Province is required'),
   canton: yup.string().required('Canton is required'),
   district: yup.string().required('District is required'),
-  fecha: yup.string().required('Date is required'),
+  date: yup.string().required('Date is required'),
   description: yup.string().required('Description is required'),
-  imagen: yup
+  image: yup
     .mixed<File>()
     .required('Image is required')
     .test('fileSize', 'File too large. Max 5MB', (file) =>
@@ -38,9 +41,9 @@ const { value: category, errorMessage: categoryError } = useField<string>('categ
 const { value: province, errorMessage: provinceError } = useField<string>('province')
 const { value: canton, errorMessage: cantonError } = useField<string>('canton')
 const { value: district, errorMessage: districtError } = useField<string>('district')
-const { value: fecha, errorMessage: fechaError } = useField<string>('fecha')
+const { value: date, errorMessage: dateError } = useField<string>('date')
 const { value: description, errorMessage: descriptionError } = useField<string>('description')
-const { value: imagen, errorMessage: imagenError } = useField<File>('imagen')
+const { value: image, errorMessage: imageError } = useField<File>('image')
 
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true
@@ -79,9 +82,8 @@ const onSubmit = handleSubmit(async (values) => {
                 :error="nameError"
                 placeholder="Enter name of the legend..."
               />   
-              <BaseInput
+              <BaseSelect
                 v-model="category"
-                type="select"
                 name="category"
                 label="Category"
                 placeholder="Select a category..."
@@ -89,46 +91,43 @@ const onSubmit = handleSubmit(async (values) => {
                 :error="categoryError"
               />
               <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <BaseInput
+                <BaseSelect
                   v-model="province"
                   name="province"
                   label="Province"
                   placeholder="Province..."
-                  type="select"
                   required
                   :error="provinceError"
                 />
             
-                <BaseInput
+                <BaseSelect
                   v-model="canton"
                   name="canton"
                   label="Canton"
                   placeholder="Canton..."
-                  type="select"
+                  
                   required
                   :error="cantonError"
                 />
-                <BaseInput
+                <BaseSelect
                   v-model="district"
                   name="district"
                   label="District"
                   placeholder="District"
-                  type="select"
                   required
                   :error="districtError"
                 />
               </div>
         
-              <BaseInput
-                v-model="fecha"
-                name="fecha"
+              <BaseDateInput
+                v-model="date"
+                name="date"
                 label="Date"
-                type="date"
                 placeholder="Select a date..."
                 required
-                :error="fechaError"
+                :error="dateError"
               />
-              <BaseInput
+              <BaseTextarea
                 v-model="description"
                 name="description"
                 label="Description"
@@ -139,14 +138,14 @@ const onSubmit = handleSubmit(async (values) => {
               />
               <div class="space-y-2">
                 <BaseInput
-                  v-model="imagen"
+                  v-model="image"
                   type="file"
                   accept="image/*"
-                  name="imagen"
+                  name="image"
                   label="Image"
                   placeholder="Upload an image of the legend"
                   required
-                  :error="imagenError"
+                  :error="imageError"
                 />    
                 <p class="text-gray-400 text-xs">
                   Formatos: JPG, PNG, GIF. Máximo 5MB
