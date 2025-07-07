@@ -42,3 +42,15 @@ export async function getCategories() {
     throw error;
   }
 }
+
+export async function deleteLegend(id: string) {
+  try {
+    await api.delete(`/legends/${id}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting legend:", error);
+    return { success: false, error };
+  }
+}
+
+

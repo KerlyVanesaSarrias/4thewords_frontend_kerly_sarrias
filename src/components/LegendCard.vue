@@ -19,7 +19,6 @@ defineEmits<{
 
 <template>
   <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
-    <!-- Image -->
     <div class="aspect-w-16 aspect-h-9">
       <img
         :src="imageUrl"

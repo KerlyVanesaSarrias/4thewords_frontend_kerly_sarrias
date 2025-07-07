@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useField, useForm } from 'vee-validate';
 import { onMounted, ref, watch } from 'vue';
+import { useToast } from 'vue-toast-notification';
 import * as yup from 'yup';
 import BaseButton from '../../components/ui/BaseButton.vue';
 import BaseDateInput from '../../components/ui/BaseDateInput.vue';
@@ -9,6 +10,7 @@ import BaseInput from '../../components/ui/BaseInput.vue';
 import BaseSelect from '../../components/ui/BaseSelect.vue';
 import BaseTextarea from '../../components/ui/BaseTextarea.vue';
 import GradientBackground from '../../components/ui/GradientBackground.vue';
+import router from '../../router';
 import { createLegend, getCategories } from '../../services/legendsService';
 import { getCantonsByProvince, getDistrictsByCanton, getProvinces } from '../../services/locationsService';
 import { Category } from '../../types/category';
@@ -16,6 +18,7 @@ import { CreateLegend } from '../../types/legends';
 import { Canton, District, Province } from '../../types/location';
 
 const loading = ref(false);
+const $toast = useToast();
 
 const schema = yup.object({
   name: yup.string().required('Name is required'),
@@ -62,9 +65,10 @@ const onSubmit = handleSubmit(async (values) => {
   }
   const response = await createLegend(body)
   if(response.success){
-    alert('created ok')
+     $toast.success('Legend Created successfully');
+     router.push('/legends')
   } else {
-    alert('Error')
+    $toast.error('error creating legend')
   }
   loading.value = false
 })
@@ -206,11 +210,12 @@ watch(canton, async (cantonId) => {
                   :error="imageError"
                 />    
                 <p class="text-gray-400 text-xs">
-                  Formatos: JPG, PNG, GIF. Máximo 5MB
+                  Formats: JPG, PNG, GIF. Max 5MB
                 </p>
               </div>
               <div class="flex space-x-4 pt-6">    
                 <BaseButton
+                  :loading="loading"
                   type="submit"
                   class="w-full"
                 >

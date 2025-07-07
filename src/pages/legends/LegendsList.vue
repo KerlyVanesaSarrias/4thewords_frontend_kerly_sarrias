@@ -1,17 +1,22 @@
 <script setup lang="ts">
-import { BookOpen, Loader2, Plus, Search, Trash2 } from "lucide-vue-next";
+import { BookOpen, Loader2, Plus, Search } from "lucide-vue-next";
+import Swal from "sweetalert2";
 import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import { useToast } from "vue-toast-notification";
 import LegendCard from "../../components/LegendCard.vue";
 import BaseButton from "../../components/ui/BaseButton.vue";
 import BaseDateInput from "../../components/ui/BaseDateInput.vue";
 import BaseInput from "../../components/ui/BaseInput.vue";
 import BaseSelect from "../../components/ui/BaseSelect.vue";
 import GradientBackground from "../../components/ui/GradientBackground.vue";
+import { deleteLegend } from "../../services/legendsService";
 import { useLegendStore } from "../../stores/legends";
-import { Legend } from "../../types/legends";
+
 
 const router = useRouter();
+const $toast = useToast();
+
 const filters = ref({
   search: "",
   category: "",
@@ -23,15 +28,34 @@ const filters = ref({
 });
 const legendsStore = useLegendStore();
 
-const showDeleteModal = ref(false);
-const leyendaAEliminar = ref<Legend | null>(null);
-const deletingLegend = ref(false);
+
 
 const navigateToCreateLegend = () => {
   router.push("/legends/create");
 };
 
-const eliminarLeyenda = () => {}
+const handleDelete = async (id: string) => {
+  const result = await Swal.fire({
+    title: '¿Remove this legend?',
+    text: 'This action cannot be undone.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#d33',
+    cancelButtonColor: '#3085d6',
+    confirmButtonText: 'Yes, delete',
+    cancelButtonText: 'Cancel',
+  })
+
+  if (result.isConfirmed) {
+    const res = await deleteLegend(id)
+    if (res.success) {
+      $toast.success('Legend successfully removed')
+      await legendsStore.getLegends()
+    } else {
+      $toast.error('Error deleting legend')
+    }
+  }
+}
 
 onMounted(() => {
   legendsStore.getLegends();
@@ -152,83 +176,13 @@ onMounted(() => {
                   :category="legend.category.name || 'Uncategorized'"
                   :location="`${legend.district?.name || ''}, ${legend.canton?.name || ''}, ${legend.province?.name 
                     || 'Without province'}`"
+                  @delete="handleDelete"
                 />
               </div>
             </div>
           </div>
         </div>
       </main>
-      <div
-        v-if="showDeleteModal"
-        class="fixed inset-0 z-50 overflow-y-auto"
-      >
-        <div class="flex min-h-screen items-center justify-center p-4">
-          <div
-            class="fixed inset-0 bg-black bg-opacity-50 transition-opacity"
-            @click="showDeleteModal = false"
-          />
-          <div class="relative bg-white rounded-lg shadow-xl max-w-lg w-full mx-auto">
-            <div class="flex items-center justify-between p-6 border-b">
-              <h3 class="text-lg font-semibold text-gray-900">
-                Confirmar Eliminación
-              </h3>
-              <button
-                @click="showDeleteModal = false"
-                class="text-gray-400 hover:text-gray-600"
-              >
-                <X class="w-6 h-6" />
-              </button>
-            </div>
-
-            <div class="p-6">
-              <div class="flex items-center space-x-3 mb-4">
-                <div class="flex-shrink-0">
-                  <AlertTriangle class="w-8 h-8 text-red-500" />
-                </div>
-                <div>
-                  <h3 class="text-lg font-medium text-gray-900">
-                    ¿Eliminar leyenda?
-                  </h3>
-                  <p class="text-gray-600">
-                    ¿Estás seguro de que deseas eliminar la leyenda "{{
-                      leyendaAEliminar?.name
-                    }}"?
-                  </p>
-                </div>
-              </div>
-              <div class="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p class="text-sm text-red-800">
-                  <strong>Advertencia:</strong> Esta acción no se puede deshacer.
-                </p>
-              </div>
-            </div>
-
-            <div class="flex justify-end space-x-3 p-6 border-t bg-gray-50">
-              <button
-                @click="showDeleteModal = false"
-                class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                @click="eliminarLeyenda"
-                :disabled="deletingLegend"
-                class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 flex items-center space-x-2"
-              >
-                <Trash2
-                  v-if="!deletingLegend"
-                  class="w-4 h-4"
-                />
-                <Loader2
-                  v-else
-                  class="w-4 h-4 animate-spin"
-                />
-                <span>{{ deletingLegend ? "Eliminando..." : "Eliminar" }}</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </GradientBackground>
 </template>
