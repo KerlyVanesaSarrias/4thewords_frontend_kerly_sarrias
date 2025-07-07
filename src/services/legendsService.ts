@@ -1,16 +1,24 @@
 import { Category } from "../types/category";
-import { CreateLegend, CreateLegendResponse, Legend } from "../types/legends";
+import { CreateLegend, CreateLegendResponse, Legend, LegendFilters } from "../types/legends";
 import api from "./axios";
 
-export async function getLegends() {
-  try {
-    const res = await api.get<Legend[]>("/legends");
-    return res.data;
-  } catch (error) {
-    console.error("Error fetching legends:", error);
-    throw error;
-  }
+export const getLegends = async (filters: LegendFilters = {}): Promise<Legend[]> => {
+  const params = new URLSearchParams()
+
+  if (filters.search) params.append('name', filters.search)
+  if (filters.category) params.append('category_id', filters.category)
+  if (filters.province) params.append('province_id', filters.province)
+  if (filters.canton) params.append('canton_id', filters.canton)
+  if (filters.district) params.append('district_id', filters.district)
+ if (filters.date) {
+  const iso = new Date(filters.date).toISOString().split('T')[0] 
+  params.append('legend_date', iso)
 }
+
+  const response = await api.get('/legends', { params })
+  return response.data
+}
+
 
 export async function createLegend(values: CreateLegend) {
   try {

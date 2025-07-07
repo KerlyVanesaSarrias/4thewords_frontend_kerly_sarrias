@@ -27,4 +27,14 @@ export type CreateLegend = {
 export type CreateLegendResponse = Omit<CreateLegend, "image"> & {
 	image_url: string | null,
 }
+
+export type LegendFilters = {
+  search?: string
+  category?: string
+  province?: string
+  canton?: string
+  district?: string
+  date?: string  
+}
+
 	
