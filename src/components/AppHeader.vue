@@ -6,7 +6,7 @@ import BaseButton from './ui/BaseButton.vue';
 <template>
   <header class="bg-secondary shadow-sm">
     <div class="max-w-7xl py-4 mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between items-center h-16">
+      <div class="flex md:justify-between items-center h-16">
         <div class="flex items-center">
           <router-link
             to="/legends"
@@ -19,7 +19,7 @@ import BaseButton from './ui/BaseButton.vue';
           </router-link>
         </div>
         <div class="flex gap-3">
-          <nav class="hidden md:flex space-x-8 text-white text-lg ">
+          <nav class="md:flex space-x-2  md:space-x-8 text-white text-sm md:text-lg ">
             <router-link
               to="/legends"
               class=" px-3 py-2 rounded-md  font-normal transition-colors"
@@ -32,7 +32,7 @@ import BaseButton from './ui/BaseButton.vue';
               class=" px-3 py-2 rounded-md  font-normal transition-colors"
               exact-active-class="text-primary"
             >
-              Create Legend
+              Create
             </router-link>
           </nav>
 
