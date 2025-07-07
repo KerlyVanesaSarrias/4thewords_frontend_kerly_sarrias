@@ -9,6 +9,8 @@ type Props = {
   disabled?: boolean
   error?: string
   accept?: string
+  
+
 }
 
 withDefaults(defineProps<Props>(), {

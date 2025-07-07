@@ -177,6 +177,7 @@ onMounted(() => {
                   :location="`${legend.district?.name || ''}, ${legend.canton?.name || ''}, ${legend.province?.name 
                     || 'Without province'}`"
                   @delete="handleDelete"
+                  @edit="(id) => router.push(`/legends/edit/${id}`)"
                 />
               </div>
             </div>

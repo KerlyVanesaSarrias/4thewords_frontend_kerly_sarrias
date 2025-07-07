@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Calendar, MapPin } from 'lucide-vue-next';
+import BaseButton from './ui/BaseButton.vue';
 
 defineProps<{
   id: string
@@ -28,7 +29,7 @@ defineEmits<{
     </div>
     <div class="p-6 space-y-3">
       <div>
-        <h3 class="text-lg font-semibold text-gray-900 line-clamp-2">
+        <h3 class="text-lg font-semibold text-gray-900 ">
           {{ name }}
         </h3>
         <span class="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full mt-1">
@@ -51,19 +52,20 @@ defineEmits<{
         </div>
       </div>
     </div>
-    <div class="px-6 py-4 bg-gray-50 border-t flex justify-between space-x-2">
-      <button
+    <div class="px-6 py-4 bg-gray-50 flex justify-between space-x-2">
+      <BaseButton
         @click="$emit('edit', id)"
-        class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors"
+        class="w-full"
       >
         Edit
-      </button>
-      <button
+      </BaseButton>
+      <BaseButton
+        variant="danger"
         @click="$emit('delete', id)"
-        class="flex-1 px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+        class="w-full"
       >
         Delete
-      </button>
+      </BaseButton>
     </div>
   </div>
 </template>

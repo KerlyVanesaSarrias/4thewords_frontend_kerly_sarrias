@@ -53,4 +53,35 @@ export async function deleteLegend(id: string) {
   }
 }
 
+export async function getLegendById(id: string) {
+  try {
+    const res = await api.get<Legend>(`/legends/${id}`);
+    return res.data;
+  } catch (error) {
+    console.error("Error fetching legend:", error);
+    return null;
+  }
+}
+
+export async function updateLegend(id: string, values: CreateLegend) {
+  try {
+    const formData = new FormData();
+    formData.append("name", values.name);
+    formData.append("category_id", values.category_id);
+    formData.append("province_id", values.province_id);
+    formData.append("canton_id", values.canton_id);
+    formData.append("district_id", values.district_id);
+    formData.append("legend_date", values.legend_date);
+    formData.append("description", values.description);
+    if (values.image) formData.append("image", values.image);
+
+    const res = await api.put(`/legends/${id}`, formData);
+    return { success: true, data: res.data };
+  } catch (error) {
+    console.error("Error updating legend:", error);
+    return { success: false, data: [] };
+  }
+}
+
+
 
