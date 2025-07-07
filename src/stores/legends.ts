@@ -2,7 +2,7 @@
 import { defineStore } from 'pinia'
 import { getCategories, getLegends } from '../services/legendsService'
 import { Category } from '../types/category'
-import { Legend } from '../types/legends'
+import { Legend, LegendFilters } from '../types/legends'
 
 export const useLegendStore = defineStore('legend', {
   state: () => ({
@@ -12,11 +12,11 @@ export const useLegendStore = defineStore('legend', {
     error: '' as string | null,
   }),
   actions: {
-    async getLegends() {
+    async getLegends(filters?: LegendFilters) {
       this.loading = true
       this.error = null
       try {
-        const data = await getLegends()
+        const data = await getLegends(filters)
         this.legends = data
       } catch (err: any) {
         this.error = err.response?.data?.detail || 'Error fetching legends'

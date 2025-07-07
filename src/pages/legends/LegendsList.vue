@@ -10,20 +10,18 @@ import BaseDateInput from "../../components/ui/BaseDateInput.vue";
 import BaseInput from "../../components/ui/BaseInput.vue";
 import BaseSelect from "../../components/ui/BaseSelect.vue";
 import GradientBackground from "../../components/ui/GradientBackground.vue";
-import { deleteLegend, getCategories, getLegends } from "../../services/legendsService";
+import { deleteLegend, getCategories } from "../../services/legendsService";
 import { getCantonsByProvince, getDistrictsByCanton, getProvinces } from "../../services/locationsService";
 import { useLegendStore } from "../../stores/legends";
 import { Category } from "../../types/category";
-import { Legend } from "../../types/legends";
+import { LegendFilters } from "../../types/legends";
 import { Canton, District, Province } from "../../types/location";
 
 
 const router = useRouter();
 const $toast = useToast();
 
-const loading = ref(false)
-const legends = ref<Legend[]>([])
-const filters = ref({
+const filters = ref<LegendFilters>({
   search: "",
   category: "",
   province: "",
@@ -36,30 +34,6 @@ const provinces = ref<Province[]>([])
 const cantons = ref<Canton[]>([])
 const districts = ref<District[]>([])
 const legendsStore = useLegendStore();
-
-
-const loadLegends = async () => {
-  loading.value = true;
-  try {
-    const cleanFilters: Record<string, string> = {};
-
-    if (filters.value.search.trim()) cleanFilters.search = filters.value.search;
-    if (filters.value.category) cleanFilters.category = filters.value.category;
-    if (filters.value.province) cleanFilters.province = filters.value.province;
-    if (filters.value.canton) cleanFilters.canton = filters.value.canton;
-    if (filters.value.district) cleanFilters.district = filters.value.district;
-    if (filters.value.date) {
-      const iso = new Date(filters.value.date).toISOString().split("T")[0];
-      cleanFilters.date = iso;
-    }
-
-    legends.value = await getLegends(cleanFilters);
-  } catch (error) {
-    console.error("Error loading legends:", error);
-    legends.value = [];
-  }
-  loading.value = false;
-};
 
 const loadFiltersData = async () => {
   categories.value = await getCategories()
@@ -95,10 +69,10 @@ const handleDelete = async (id: string) => {
 
 onMounted(async () => {
   await loadFiltersData()
-  await loadLegends()
+  await legendsStore.getLegends()
 })
 
-watch(filters, loadLegends, { deep: true })
+watch(filters, (filters) => legendsStore.getLegends(filters), { deep: true })
 
 watch(() => filters.value.province, async (provinceId) => {
   if (provinceId) {
@@ -199,7 +173,7 @@ watch(() => filters.value.canton, async (cantonId) => {
               </div>
 
               <div
-                v-if="loading"
+                v-if="legendsStore.loading"
                 class="text-center py-12"
               >
                 <Loader2 class="inline-block animate-spin h-8 w-8 text-blue-600" />
@@ -209,7 +183,7 @@ watch(() => filters.value.canton, async (cantonId) => {
               </div>
 
               <div
-                v-else-if="legends.length === 0"
+                v-else-if="legendsStore.legends.length === 0"
                 class="text-center py-12"
               >
                 <BookOpen class="mx-auto h-16 w-16 text-gray-400 mb-4" />
@@ -228,7 +202,7 @@ watch(() => filters.value.canton, async (cantonId) => {
                 class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
               >
                 <LegendCard
-                  v-for="legend in legends"
+                  v-for="legend in legendsStore.legends"
                   :key="legend.id"
                   :id="legend.id"
                   :name="legend.name"

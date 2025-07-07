@@ -35,6 +35,4 @@ export type LegendFilters = {
   canton?: string
   district?: string
   date?: string  
-}
-
-	
+}	
