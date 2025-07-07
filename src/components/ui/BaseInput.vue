@@ -4,19 +4,18 @@ import { computed, ref } from 'vue';
 import BaseButton from './BaseButton.vue';
 
 defineEmits<{
-  (e: 'update:modelValue', value: string  | File ): void
+  (e: 'update:modelValue', value: string  ): void
 }>()
 
 type Props = {
   id?: string
   label?: string
-  type?: 'text' | 'email' | 'password' | 'number'   | 'file'
- modelValue?: string | File;
+  type?: 'text' | 'email' | 'password' | 'number'
+  modelValue?: string | File;
   placeholder?: string
   required?: boolean
   disabled?: boolean
   error?: string
-  accept?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -26,7 +25,6 @@ const props = withDefaults(defineProps<Props>(), {
   modelValue: '',
   placeholder: '',
   error: '',
-  accept: 'image/*',
 })
 
 const showPassword = ref(false)
@@ -66,7 +64,6 @@ const togglePassword = () => {
 
     <div class="relative">
       <input
-        v-if="type !== 'file' "   
         :id="id"
         :type="inputType"
         :value="modelValue"
@@ -76,18 +73,7 @@ const togglePassword = () => {
         :class="inputClasses"
         @input="$emit('update:modelValue', ($event.target as HTMLInputElement).value)"
       >
-      <input
-        v-else-if="type === 'file'"
-        :id="id"
-        type="file"
-        :accept="accept"
-        :required="required"
-        :disabled="disabled"
-        class="block w-full text-sm text-gray-200 file:mr-4 file:py-2 file:px-4
-         file:rounded-md file:border-0 file:text-sm file:font-semibold
-         file:bg-purple-600 file:text-white hover:file:bg-purple-700
-         transition duration-200"
-      >
+    
       <BaseButton
         v-if="type === 'password'"
         type="button"

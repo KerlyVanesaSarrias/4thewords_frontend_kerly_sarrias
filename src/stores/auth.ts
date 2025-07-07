@@ -18,6 +18,7 @@ export const useAuthStore = defineStore('auth', {
 
         const { access_token } = res;
         this.token = access_token;
+        localStorage.setItem('token', access_token)
         const user = await getProfile();
         this.user = user
         router.push('/legends')
@@ -30,6 +31,7 @@ export const useAuthStore = defineStore('auth', {
       this.token = ''
       this.user = null
       localStorage.removeItem('token')
+      router.push('/')
     },
   },
 })

@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import { useField, useForm } from 'vee-validate';
-import { ref } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import * as yup from 'yup';
 import BaseButton from '../../components/ui/BaseButton.vue';
 import BaseDateInput from '../../components/ui/BaseDateInput.vue';
+import BaseFileInput from '../../components/ui/BaseFileInput.vue';
 import BaseInput from '../../components/ui/BaseInput.vue';
 import BaseSelect from '../../components/ui/BaseSelect.vue';
 import BaseTextarea from '../../components/ui/BaseTextarea.vue';
 import GradientBackground from '../../components/ui/GradientBackground.vue';
-
+import { createLegend, getCategories } from '../../services/legendsService';
+import { getCantonsByProvince, getDistrictsByCanton, getProvinces } from '../../services/locationsService';
+import { Category } from '../../types/category';
+import { CreateLegend } from '../../types/legends';
+import { Canton, District, Province } from '../../types/location';
 
 const loading = ref(false);
-
-
 
 const schema = yup.object({
   name: yup.string().required('Name is required'),
@@ -47,10 +50,62 @@ const { value: image, errorMessage: imageError } = useField<File>('image')
 
 const onSubmit = handleSubmit(async (values) => {
   loading.value = true
-  console.log('Legend created with values:', values)
-  setTimeout(() => (loading.value = false), 1000)
+  const body: CreateLegend = {
+    name: values.name,
+    category_id: values.category,
+    province_id: values.province,
+    canton_id: values.canton,
+    district_id: values.district,
+    legend_date: values.date,
+    description: values.description,
+    image: values.image
+  }
+  const response = await createLegend(body)
+  if(response.success){
+    alert('created ok')
+  } else {
+    alert('Error')
+  }
+  loading.value = false
 })
 
+const provicesList = ref<Province[]>([]);
+const cantonList = ref<Canton[]>([]);
+const districtList = ref<District[]>([]);
+const categories = ref<Category[]>([])
+
+const loadProvinces = async () => {
+  const provincesResponse = await getProvinces();
+  provicesList.value = provincesResponse;
+}
+
+const loadCategories = async () => {
+  const categoriesResponse = await getCategories();
+  categories.value = categoriesResponse;
+
+}
+
+onMounted(() => {
+  loadProvinces();
+  loadCategories();
+});
+
+watch(province, async (provinceId) => {
+  if (provinceId) {
+    const cantonsResponse = await getCantonsByProvince(provinceId);
+    cantonList.value = cantonsResponse;
+    canton.value = '';
+    district.value = '';
+  }
+});
+
+watch(canton, async (cantonId) => {
+  if (cantonId) {
+    const districtsResponse = await getDistrictsByCanton(cantonId);
+    districtList.value = districtsResponse;
+    district.value = '';
+  }
+});
 </script>
 
 <template>
@@ -87,6 +142,7 @@ const onSubmit = handleSubmit(async (values) => {
                 name="category"
                 label="Category"
                 placeholder="Select a category..."
+                :options="categories.map(c => ({ value: c.id, label: c.name }))"
                 required
                 :error="categoryError"
               />
@@ -96,6 +152,7 @@ const onSubmit = handleSubmit(async (values) => {
                   name="province"
                   label="Province"
                   placeholder="Province..."
+                  :options="provicesList.map(p => ({ value: p.id, label: p.name }))"
                   required
                   :error="provinceError"
                 />
@@ -105,7 +162,8 @@ const onSubmit = handleSubmit(async (values) => {
                   name="canton"
                   label="Canton"
                   placeholder="Canton..."
-                  
+                  :disabled="!province"
+                  :options="cantonList.map(c => ({ value: c.id, label: c.name }))"
                   required
                   :error="cantonError"
                 />
@@ -114,7 +172,9 @@ const onSubmit = handleSubmit(async (values) => {
                   name="district"
                   label="District"
                   placeholder="District"
+                  :options="districtList.map(d => ({ value: d.id, label: d.name }))"
                   required
+                  :disabled="!canton"
                   :error="districtError"
                 />
               </div>
@@ -137,10 +197,8 @@ const onSubmit = handleSubmit(async (values) => {
                 :error="descriptionError"
               />
               <div class="space-y-2">
-                <BaseInput
+                <BaseFileInput
                   v-model="image"
-                  type="file"
-                  accept="image/*"
                   name="image"
                   label="Image"
                   placeholder="Upload an image of the legend"
